@@ -16,5 +16,5 @@
     - name: Show Result
       debug:
         msg:
-          - "Inventory: {{ Inventory_hostname }}"
+          - "Inventory: {{ inventory_hostname }}"
           - "Actual Hostname: {{ host.stdout }}"
