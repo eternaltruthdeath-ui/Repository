@@ -1,0 +1,16 @@
+---
+- name: Validate connectivity
+  hosts: all
+  gather_facts: no
+
+  tasks:
+
+    - name: Ping targets
+      ansible.builtin.ping:
+
+    - name: Show hostname
+      command: hostname
+      register: host
+
+    - debug:
+        msg: "{{ inventory_hostname }} -> {{ host.stdout }}"
