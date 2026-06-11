@@ -9,6 +9,6 @@
         msg:
           - "Hostname: {{ ansible_hostname }}"
           - "OS: {{ ansible_distribution }}"
-          - "Version: {ansible_distribution_version }}"
+          - "Version: {{ ansible_distribution_version }}"
           - "Memory MB: {{ ansible_memtotal_mb }}"
           - "CPU: {{ ansible_processor_vcpus }}"
