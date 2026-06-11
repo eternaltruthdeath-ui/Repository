@@ -7,7 +7,7 @@
 
     - debug:
         msg:
-          - "Hostname: {{ hostnam e}}"
+          - "Hostname: {{ hostname}}"
           - "OS: {{ ansible_distribution }}"
           - "Version: {ansible_distribution_version }}"
           - "Memory MB: {{ ansible_memtotal_mb }}"
