@@ -1,0 +1,28 @@
+---
+
+- name: Hello World - My First playbook
+
+  hosts: all
+  become: false
+  
+  tasks:
+    - name: Print a greeting message
+      ansible.builtin.debug:
+        msg: "Hello from {{ inventory_hostname}} running {{ ansible_distribution}}"
+
+    - name: Show current date and time on remote host
+      ansible.builtin.command: date
+      register: date_output
+
+    - name: Display the Date output
+      ansible.builtin.debug:
+        var: date_output.stdout
+
+    - name: Check if /tmp directory exist
+      ansible.builtin.stat:
+        path: /tmp
+      register: tmp_stat
+
+    - name: Report /tmp status
+      ansible.builtin.debug:
+        msg: "/tmp exists: {{ tmp_stat.stat.exists }}, is dir: {{tmp_stat.stat.isdir }}"

@@ -1,0 +1,25 @@
+all:
+children:
+linux:
+children:
+lmint_server:
+hosts:
+lmint-virtual-machine:
+
+ansible_host: 192.168.241.145
+
+rhel-servers:
+newgl-rhelvm01:
+ansible_host: 192.168.241.146
+
+newgl-rhelvm02: 192.168.241.147
+
+vars:
+ansible_user: masterubuntu
+
+
+windows_servers:
+hosts:
+test-svm-01.gelord.org:
+ansible_host: 192.168.241.142
+

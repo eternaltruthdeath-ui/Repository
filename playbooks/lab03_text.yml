@@ -1,0 +1,13 @@
+---
+- name: Create Validation File
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Create File
+      copy:
+        content: |
+          Created by AWX
+          Host={{ inventory_hostname }}
+        dest: /tmp/awx-hostname.txt
+        mode: '0644'

@@ -1,0 +1,14 @@
+---
+- name: Collect OS Information
+  hosts: all
+  gather_facts: yes
+
+  tasks:
+
+    - debug:
+        msg:
+          - "Hostname: {{ ansible_hostname }}"
+          - "OS: {{ ansible_distribution }}"
+          - "Version: {{ ansible_distribution_version }}"
+          - "Memory MB: {{ ansible_memtotal_mb }}"
+          - "CPU: {{ ansible_processor_vcpus }}"

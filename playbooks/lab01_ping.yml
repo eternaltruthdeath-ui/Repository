@@ -1,0 +1,20 @@
+---
+- name: Connectivity Test
+  hosts: all
+  gather_facts: no
+
+  tasks:
+
+    - name: Ping all servers
+      ping:
+
+    - name: Collect Hostname
+      command: hostname
+      register: host
+
+
+    - name: Show Result
+      debug:
+        msg:
+          - "Inventory: {{ inventory_hostname }}"
+          - "Actual Hostname: {{ host.stdout }}"
