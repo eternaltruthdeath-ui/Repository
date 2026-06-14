@@ -1,0 +1,13 @@
+---
+  plugin: theforeman.foreman.foreman
+
+  url: "https://192.168.241.149"
+  user: "admin"
+  password: "Password@#12345"
+
+  validate_certs: false
+
+  want_hostcollection: true
+  group_prefix: "foreman_"
+
+

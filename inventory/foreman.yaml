@@ -1,13 +1,15 @@
 ---
-  plugin: theforeman.foreman.foreman
+plugin: theforeman.foreman.foreman
 
-  url: "https://192.168.241.149"
-  user: "admin"
-  password: "Password@#12345"
+url: "https://192.168.241.149"
+user: "admin"
+password: "password"
 
-  validate_certs: false
+validate_certs: false
+use_reports_api: false
 
-  want_hostcollection: true
-  group_prefix: "foreman_"
+compose:
+  ansible_host: ip
 
-
+want_hostcollections: true
+group_prefix: "foreman_"
