@@ -1,0 +1,7 @@
+*.retry
+*.log
+*.vault
+.vault_pass
+__pycache__/
+*.pyc
+.DS_Store

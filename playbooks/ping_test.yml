@@ -1,0 +1,16 @@
+---
+- name: Ansible Linux Connectivity Test
+  hosts: linux
+  gather_facts: true
+
+  tasks:
+    - name: Test connectivity
+      ansible.builtin.ping:
+
+    - name: Display hostname
+      ansible.builtin.debug:
+        msg: "Connected successfully to {{ inventory_hostname }}"
+
+    - name: Display operating system
+      ansible.builtin.debug:
+        msg: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
