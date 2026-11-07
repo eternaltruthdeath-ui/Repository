@@ -1,0 +1,26 @@
+---
+- name: Collect Linux Server Information
+  hosts: linux
+  gather_facts: true
+
+  tasks:
+
+    - name: Display hostname
+      ansible.builtin.debug:
+        msg: "Hostname: {{ ansible_hostname }}"
+
+    - name: Display IP address
+      ansible.builtin.debug:
+        msg: "IP Address: {{ ansible_default_ipv4.address }}"
+
+    - name: Display operating system
+      ansible.builtin.debug:
+        msg: "OS: {{ ansible_distribution }}"
+
+    - name: Display OS version
+      ansible.builtin.debug:
+        msg: "OS Version: {{ ansible_distribution_version }}"
+
+    - name: Display kernel version
+      ansible.builtin.debug:
+        msg: "Kernel: {{ ansible_kernel }}"

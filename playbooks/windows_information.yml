@@ -1,0 +1,16 @@
+---
+- name: Windows Server Information
+  hosts: windows
+  gather_facts: false
+
+  tasks:
+    - name: Test Windows connectivity
+      ansible.windows.win_ping:
+
+    - name: Get Windows hostname
+      ansible.windows.win_shell: hostname
+      register: hostname_output
+
+    - name: Display hostname
+      ansible.builtin.debug:
+        msg: "{{ hostname_output.stdout | trim }}"

@@ -1,0 +1,16 @@
+---
+- name: Ubuntu Server Management
+  hosts: ubuntu
+  become: true
+  gather_facts: true
+
+  tasks:
+
+    - name: Display Ubuntu version
+      ansible.builtin.debug:
+        msg: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Update package cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600

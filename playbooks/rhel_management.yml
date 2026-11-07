@@ -1,0 +1,20 @@
+---
+- name: RHEL Server Management
+  hosts: rhel
+  become: true
+  gather_facts: true
+
+  tasks:
+
+    - name: Display RHEL version
+      ansible.builtin.debug:
+        msg: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Check available disk space
+      ansible.builtin.command: df -h
+      register: disk_output
+      changed_when: false
+
+    - name: Display disk usage
+      ansible.builtin.debug:
+        var: disk_output.stdout_lines
