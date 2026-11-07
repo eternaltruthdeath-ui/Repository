@@ -1,0 +1,11 @@
+[defaults]
+inventory = ./inventory/hosts.yaml
+remote_user = mythadmin
+host_key_checking = True
+interpreter_python = auto_silent
+retry_files_enabled = False
+
+[privilege_escalation]
+become = False
+become_method = sudo
+become_user = root
