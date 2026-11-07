@@ -3,6 +3,9 @@
   hosts: windows
   gather_facts: false
 
+  vars_files:
+    - ../vault/windows.yml
+
   tasks:
     - name: Test Windows connectivity
       ansible.windows.win_ping:
