@@ -18,17 +18,3 @@ all:
             sd-ubkub8s:
               ansible_host: 192.168.56.108
               ansible_user: mythadmin
-
-                #        rhel:
-                #          hosts:
-                #            rhel-server01:
-                #              ansible_host: 192.168.56.102
-                #              ansible_user: mythadmin
-
-    windows:
-      hosts:
-        windows-server01:
-          ansible_host: 192.168.56.105
-
-        windows-server02:
-          ansible_host: 192.168.56.104
