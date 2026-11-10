@@ -1,0 +1,50 @@
+---
+- name: Linux Read Only Health Check
+  hosts: linux
+  gather_facts: false
+
+  tasks:
+
+    - name: Test SSH connectivity
+      ansible.builtin.ping:
+
+    - name: Collect Linux system information
+      ansible.builtin.setup:
+        gather_subset:
+          - min
+          - hardware
+          - network
+
+    - name: Display Linux hostname
+      ansible.builtin.debug:
+        msg: "Hostname: {{ ansible_hostname }}"
+
+    - name: Display Linux operating system
+      ansible.builtin.debug:
+        msg: "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Display Linux kernel
+      ansible.builtin.debug:
+        msg: "Kernel: {{ ansible_kernel }}"
+
+    - name: Display CPU information
+      ansible.builtin.debug:
+        msg: "CPU cores: {{ ansible_processor_vcpus }}"
+
+    - name: Display available memory
+      ansible.builtin.debug:
+        msg: "Total memory: {{ ansible_memtotal_mb }} MB"
+
+    - name: Check root filesystem usage
+      ansible.builtin.command:
+        cmd: df -h /
+      register: linux_disk
+      changed_when: false
+
+    - name: Display disk information
+      ansible.builtin.debug:
+        var: linux_disk.stdout_lines
+
+    - name: Linux test completed
+      ansible.builtin.debug:
+        msg: "Linux read-only health check completed successfully."

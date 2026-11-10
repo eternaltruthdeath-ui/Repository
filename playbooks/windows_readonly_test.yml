@@ -1,0 +1,73 @@
+---
+- name: Windows Read Only Health Check
+  hosts: windows
+  gather_facts: false
+
+  tasks:
+
+    - name: Test WinRM connectivity
+      ansible.windows.win_ping:
+
+    - name: Get Windows operating system information
+      ansible.windows.win_shell: |
+        Get-CimInstance Win32_OperatingSystem |
+        Select-Object Caption, Version, BuildNumber,
+        OSArchitecture, LastBootUpTime |
+        Format-List
+      register: windows_os
+      changed_when: false
+
+    - name: Display Windows OS information
+      ansible.builtin.debug:
+        var: windows_os.stdout_lines
+
+    - name: Get Windows hostname
+      ansible.windows.win_shell: |
+        hostname
+      register: windows_hostname
+      changed_when: false
+
+    - name: Display Windows hostname
+      ansible.builtin.debug:
+        var: windows_hostname.stdout_lines
+
+    - name: Get Windows CPU information
+      ansible.windows.win_shell: |
+        Get-CimInstance Win32_Processor |
+        Select-Object Name, NumberOfCores,
+        NumberOfLogicalProcessors |
+        Format-List
+      register: windows_cpu
+      changed_when: false
+
+    - name: Display CPU information
+      ansible.builtin.debug:
+        var: windows_cpu.stdout_lines
+
+    - name: Get Windows memory information
+      ansible.windows.win_shell: |
+        Get-CimInstance Win32_ComputerSystem |
+        Select-Object TotalPhysicalMemory |
+        Format-List
+      register: windows_memory
+      changed_when: false
+
+    - name: Display memory information
+      ansible.builtin.debug:
+        var: windows_memory.stdout_lines
+
+    - name: Get Windows disk information
+      ansible.windows.win_shell: |
+        Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" |
+        Select-Object DeviceID, Size, FreeSpace |
+        Format-Table -AutoSize
+      register: windows_disk
+      changed_when: false
+
+    - name: Display disk information
+      ansible.builtin.debug:
+        var: windows_disk.stdout_lines
+
+    - name: Windows test completed
+      ansible.builtin.debug:
+        msg: "Windows read-only health check completed successfully."
