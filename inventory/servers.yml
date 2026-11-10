@@ -15,6 +15,10 @@ all:
               ansible_host: 192.168.56.109
               ansible_user: mythadmin
 
+            sd-ubkub8s:
+              ansible_host: 192.168.56.108
+              ansible_user: mythadmin
+
                 #        rhel:
                 #          hosts:
                 #            rhel-server01:
