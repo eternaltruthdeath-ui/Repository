@@ -3,6 +3,9 @@
   hosts: windows
   gather_facts: false
 
+  vars_files:
+    - ../vault/windows.yml
+
   tasks:
 
     - name: Test WinRM connectivity
@@ -22,8 +25,7 @@
         var: windows_os.stdout_lines
 
     - name: Get Windows hostname
-      ansible.windows.win_shell: |
-        hostname
+      ansible.windows.win_shell: hostname
       register: windows_hostname
       changed_when: false
 
@@ -47,7 +49,10 @@
     - name: Get Windows memory information
       ansible.windows.win_shell: |
         Get-CimInstance Win32_ComputerSystem |
-        Select-Object TotalPhysicalMemory |
+        Select-Object @{
+          Name='TotalMemoryGB';
+          Expression={[math]::Round($_.TotalPhysicalMemory / 1GB, 2)}
+        } |
         Format-List
       register: windows_memory
       changed_when: false
@@ -59,12 +64,14 @@
     - name: Get Windows disk information
       ansible.windows.win_shell: |
         Get-CimInstance Win32_LogicalDisk -Filter "DriveType=3" |
-        Select-Object DeviceID, Size, FreeSpace |
+        Select-Object DeviceID,
+        @{Name='SizeGB';Expression={[math]::Round($_.Size / 1GB, 2)}},
+        @{Name='FreeGB';Expression={[math]::Round($_.FreeSpace / 1GB, 2)}} |
         Format-Table -AutoSize
       register: windows_disk
       changed_when: false
 
-    - name: Display disk information
+    - name: Display Windows disk information
       ansible.builtin.debug:
         var: windows_disk.stdout_lines
 
