@@ -1,0 +1,50 @@
+---
+- name: Linux Network Audit - Read Only
+  hosts: linux
+  gather_facts: false
+
+  tasks:
+
+    - name: Check network interfaces
+      ansible.builtin.command:
+        cmd: ip -brief address
+      register: interfaces
+      changed_when: false
+
+    - name: Display network interfaces
+      ansible.builtin.debug:
+        var: interfaces.stdout_lines
+
+    - name: Check routing table
+      ansible.builtin.command:
+        cmd: ip route
+      register: routes
+      changed_when: false
+
+    - name: Display routes
+      ansible.builtin.debug:
+        var: routes.stdout_lines
+
+    - name: Check DNS configuration
+      ansible.builtin.command:
+        cmd: cat /etc/resolv.conf
+      register: dns
+      changed_when: false
+
+    - name: Display DNS configuration
+      ansible.builtin.debug:
+        var: dns.stdout_lines
+
+    - name: Check listening ports
+      ansible.builtin.command:
+        cmd: ss -tuln
+      register: ports
+      changed_when: false
+
+    - name: Display listening ports
+      ansible.builtin.debug:
+        var: ports.stdout_lines
+
+    - name: Network audit completed
+      ansible.builtin.debug:
+        msg: "Linux network audit completed."

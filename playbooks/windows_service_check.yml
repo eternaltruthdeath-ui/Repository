@@ -1,0 +1,49 @@
+---
+- name: Windows Service Audit - Read Only
+  hosts: windows
+  gather_facts: false
+
+  tasks:
+
+    - name: Get running services
+      ansible.windows.win_shell: |
+        Get-Service |
+        Where-Object {$_.Status -eq 'Running'} |
+        Select-Object Name, DisplayName, Status |
+        Format-Table -AutoSize
+      register: running_services
+      changed_when: false
+
+    - name: Display running services
+      ansible.builtin.debug:
+        var: running_services.stdout_lines
+
+    - name: Get stopped services
+      ansible.windows.win_shell: |
+        Get-Service |
+        Where-Object {$_.Status -eq 'Stopped'} |
+        Select-Object Name, DisplayName, Status |
+        Format-Table -AutoSize
+      register: stopped_services
+      changed_when: false
+
+    - name: Display stopped services
+      ansible.builtin.debug:
+        var: stopped_services.stdout_lines
+
+    - name: Get automatic startup services
+      ansible.windows.win_shell: |
+        Get-CimInstance Win32_Service |
+        Where-Object {$_.StartMode -eq 'Auto'} |
+        Select-Object Name, DisplayName, State, StartMode |
+        Format-Table -AutoSize
+      register: automatic_services
+      changed_when: false
+
+    - name: Display automatic services
+      ansible.builtin.debug:
+        var: automatic_services.stdout_lines
+
+    - name: Service audit completed
+      ansible.builtin.debug:
+        msg: "Windows service audit completed."

@@ -1,0 +1,54 @@
+---
+- name: Linux System Audit - Read Only
+  hosts: linux
+  gather_facts: true
+
+  tasks:
+
+    - name: Display hostname
+      ansible.builtin.debug:
+        msg: "{{ ansible_hostname }}"
+
+    - name: Display FQDN
+      ansible.builtin.debug:
+        msg: "{{ ansible_fqdn }}"
+
+    - name: Display operating system
+      ansible.builtin.debug:
+        msg: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
+
+    - name: Display kernel version
+      ansible.builtin.debug:
+        msg: "{{ ansible_kernel }}"
+
+    - name: Display CPU information
+      ansible.builtin.debug:
+        msg: "CPU cores: {{ ansible_processor_vcpus }}"
+
+    - name: Display memory information
+      ansible.builtin.debug:
+        msg: "Total RAM: {{ ansible_memtotal_mb }} MB"
+
+    - name: Check disk utilization
+      ansible.builtin.command:
+        cmd: df -hT
+      register: disk_info
+      changed_when: false
+
+    - name: Display disk information
+      ansible.builtin.debug:
+        var: disk_info.stdout_lines
+
+    - name: Check system uptime
+      ansible.builtin.command:
+        cmd: uptime
+      register: uptime_info
+      changed_when: false
+
+    - name: Display uptime
+      ansible.builtin.debug:
+        var: uptime_info.stdout
+
+    - name: Audit completed
+      ansible.builtin.debug:
+        msg: "Linux system audit completed."

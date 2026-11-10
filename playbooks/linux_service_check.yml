@@ -1,0 +1,30 @@
+---
+- name: Linux Service Audit - Read Only
+  hosts: linux
+  gather_facts: false
+
+  tasks:
+
+    - name: Get running services
+      ansible.builtin.command:
+        cmd: systemctl list-units --type=service --state=running --no-pager
+      register: running_services
+      changed_when: false
+
+    - name: Display running services
+      ansible.builtin.debug:
+        var: running_services.stdout_lines
+
+    - name: Get failed services
+      ansible.builtin.command:
+        cmd: systemctl --failed --no-pager
+      register: failed_services
+      changed_when: false
+
+    - name: Display failed services
+      ansible.builtin.debug:
+        var: failed_services.stdout_lines
+
+    - name: Service audit completed
+      ansible.builtin.debug:
+        msg: "Linux service audit completed."

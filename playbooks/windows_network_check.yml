@@ -1,0 +1,59 @@
+---
+- name: Windows Network Audit - Read Only
+  hosts: windows
+  gather_facts: false
+
+  tasks:
+
+    - name: Get network adapter information
+      ansible.windows.win_shell: |
+        Get-NetAdapter |
+        Select-Object Name, InterfaceDescription,
+        Status, MacAddress, LinkSpeed |
+        Format-Table -AutoSize
+      register: adapters
+      changed_when: false
+
+    - name: Display network adapters
+      ansible.builtin.debug:
+        var: adapters.stdout_lines
+
+    - name: Get IP configuration
+      ansible.windows.win_shell: |
+        Get-NetIPConfiguration |
+        Format-List InterfaceAlias, IPv4Address,
+        IPv4DefaultGateway, DNSServer
+      register: ip_info
+      changed_when: false
+
+    - name: Display IP configuration
+      ansible.builtin.debug:
+        var: ip_info.stdout_lines
+
+    - name: Get DNS configuration
+      ansible.windows.win_shell: |
+        Get-DnsClientServerAddress |
+        Format-Table -AutoSize
+      register: dns_info
+      changed_when: false
+
+    - name: Display DNS configuration
+      ansible.builtin.debug:
+        var: dns_info.stdout_lines
+
+    - name: Get listening TCP ports
+      ansible.windows.win_shell: |
+        Get-NetTCPConnection -State Listen |
+        Select-Object LocalAddress, LocalPort, State |
+        Sort-Object LocalPort |
+        Format-Table -AutoSize
+      register: tcp_ports
+      changed_when: false
+
+    - name: Display listening TCP ports
+      ansible.builtin.debug:
+        var: tcp_ports.stdout_lines
+
+    - name: Network audit completed
+      ansible.builtin.debug:
+        msg: "Windows network audit completed."
