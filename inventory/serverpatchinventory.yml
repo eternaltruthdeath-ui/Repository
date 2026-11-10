@@ -7,14 +7,14 @@ all:
 
         ubuntu:
           hosts:
-            ubvmawxk8s:
-              ansible_host: 192.168.211.136
-              ansible_user: mythadmin
-
             sd-ubjendock:
               ansible_host: 192.168.56.109
               ansible_user: mythadmin
 
             sd-ubkub8s:
               ansible_host: 192.168.56.108
+              ansible_user: mythadmin
+
+            sd-ubjendock:
+              ansible_host: 192.168.56.109
               ansible_user: mythadmin
