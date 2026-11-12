@@ -1,0 +1,12 @@
+---
+- name: Show hostname and uptime
+	hosts: all
+	gather_facts: true
+	tasks:
+		- name: Display hostname
+			ansible.builtin.debug:
+				var: ansible_facts.hostname
+
+		- name: Display uptime
+			ansible.builtin.debug:
+				var: ansible_facts.uptime_seconds
