@@ -1,11 +1,20 @@
-- name: Show hostname and uptime
-	hosts: all
-	gather_facts: true
-	tasks:
-		- name: Display hostname
-			ansible.builtin.debug:
-				var: ansible_facts.hostname
+---
+- name: Test hostname and uptime
+  hosts: ubuntu
+  gather_facts: false
+  tasks:
+    - name: Get hostname
+      ansible.builtin.command: hostname
+      register: hostname_result
+      changed_when: false
 
-		- name: Display uptime
-			ansible.builtin.debug:
-				var: ansible_facts.uptime_seconds
+    - name: Get uptime
+      ansible.builtin.command: uptime
+      register: uptime_result
+      changed_when: false
+
+    - name: Display hostname and uptime
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ hostname_result.stdout }}"
+          - "Uptime: {{ uptime_result.stdout }}"
