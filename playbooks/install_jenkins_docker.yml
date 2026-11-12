@@ -1,0 +1,180 @@
+---
+- name: Install Jenkins and Docker on sd-ubjendock
+  hosts: sd-ubjendock
+  become: true
+  gather_facts: true
+
+  vars:
+    jenkins_port: 8080
+    jenkins_service: jenkins
+    docker_service: docker
+
+    common_packages:
+      - curl
+      - wget
+      - gnupg
+      - ca-certificates
+      - fontconfig
+      - openjdk-21-jre
+
+    jenkins_key_url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key"
+    docker_key_url: "https://download.docker.com/linux/ubuntu/gpg"
+
+  tasks:
+
+    # ------------------------------------------------
+    # PHASE 1: PRE-INSTALLATION CHECKS
+    # ------------------------------------------------
+
+    - name: Verify target operating system
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Ubuntu"
+        fail_msg: "This playbook supports Ubuntu only."
+        success_msg: "Ubuntu operating system verified."
+
+    - name: Display target server information
+      ansible.builtin.debug:
+        msg:
+          - "Hostname: {{ ansible_hostname }}"
+          - "Distribution: {{ ansible_distribution }}"
+          - "Version: {{ ansible_distribution_version }}"
+          - "Architecture: {{ ansible_architecture }}"
+
+    - name: Update APT package cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install common dependencies
+      ansible.builtin.apt:
+        name: "{{ common_packages }}"
+        state: present
+
+    # ------------------------------------------------
+    # PHASE 2: INSTALL JENKINS
+    # ------------------------------------------------
+
+    - name: Create APT keyrings directory
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: Download Jenkins repository signing key
+      ansible.builtin.get_url:
+        url: "{{ jenkins_key_url }}"
+        dest: /etc/apt/keyrings/jenkins-keyring.asc
+        mode: "0644"
+
+    - name: Configure Jenkins LTS repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        filename: jenkins
+        state: present
+        update_cache: true
+
+    - name: Install Jenkins
+      ansible.builtin.apt:
+        name: jenkins
+        state: present
+        update_cache: true
+
+    - name: Enable and start Jenkins
+      ansible.builtin.systemd:
+        name: "{{ jenkins_service }}"
+        enabled: true
+        state: started
+
+    # ------------------------------------------------
+    # PHASE 3: INSTALL DOCKER
+    # ------------------------------------------------
+
+    - name: Download Docker repository signing key
+      ansible.builtin.get_url:
+        url: "{{ docker_key_url }}"
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+
+    - name: Configure Docker repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        filename: docker
+        state: present
+        update_cache: true
+
+    - name: Install Docker Engine and plugins
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Enable and start Docker
+      ansible.builtin.systemd:
+        name: "{{ docker_service }}"
+        enabled: true
+        state: started
+
+    # ------------------------------------------------
+    # PHASE 4: VALIDATE INSTALLATION
+    # ------------------------------------------------
+
+    - name: Check Jenkins service
+      ansible.builtin.command:
+        argv:
+          - systemctl
+          - is-active
+          - jenkins
+      register: jenkins_status
+      changed_when: false
+
+    - name: Check Docker service
+      ansible.builtin.command:
+        argv:
+          - systemctl
+          - is-active
+          - docker
+      register: docker_status
+      changed_when: false
+
+    - name: Check Java version
+      ansible.builtin.command: java -version
+      register: java_version
+      changed_when: false
+      failed_when: false
+
+    - name: Check Docker version
+      ansible.builtin.command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Wait for Jenkins port
+      ansible.builtin.wait_for:
+        port: "{{ jenkins_port }}"
+        host: 127.0.0.1
+        timeout: 120
+        state: started
+
+    - name: Validate Jenkins and Docker services
+      ansible.builtin.assert:
+        that:
+          - jenkins_status.stdout == "active"
+          - docker_status.stdout == "active"
+          - docker_version.rc == 0
+        success_msg: "Jenkins and Docker installed successfully!"
+        fail_msg: "One or more installation checks failed."
+
+    - name: Display installation summary
+      ansible.builtin.debug:
+        msg:
+          - "Server: {{ ansible_hostname }}"
+          - "Jenkins: {{ jenkins_status.stdout }}"
+          - "Jenkins Port: {{ jenkins_port }}"
+          - "Docker: {{ docker_status.stdout }}"
+          - "Docker Version: {{ docker_version.stdout }}"
+          - "Java: {{ java_version.stderr | default('Check manually') }}"
