@@ -9,7 +9,7 @@
     docker_image: nginx:latest
     host_port: 8081
     container_port: 80
-    docker_action: "{{ action | default('STATUS') }}"
+    docker_action: "{{ docker_operation | default('STATUS') }}"
 
   tasks:
 
