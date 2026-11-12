@@ -2,7 +2,9 @@
 - name: Test hostname and uptime
   hosts: ubuntu
   gather_facts: false
+
   tasks:
+
     - name: Get hostname
       ansible.builtin.command: hostname
       register: hostname_result
