@@ -1,0 +1,91 @@
+---
+- name: Manage Nginx Docker container
+  hosts: docker_servers
+  become: true
+  gather_facts: false
+
+  vars:
+    container_name: nginx-website
+    docker_image: nginx:latest
+    host_port: 8081
+    container_port: 80
+    docker_action: "{{ action | default('STATUS') }}"
+
+  tasks:
+
+    - name: Validate requested action
+      ansible.builtin.assert:
+        that:
+          - docker_action in ['DEPLOY', 'START', 'STOP', 'RESTART', 'REMOVE', 'STATUS']
+        fail_msg: "Invalid Docker action requested"
+
+    - name: Deploy Nginx container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ docker_image }}"
+        state: started
+        pull: always
+        restart_policy: unless-stopped
+        published_ports:
+          - "{{ host_port }}:{{ container_port }}"
+      when: docker_action == 'DEPLOY'
+
+    - name: Start Nginx container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: started
+      when: docker_action == 'START'
+
+    - name: Stop Nginx container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: stopped
+      when: docker_action == 'STOP'
+
+    - name: Restart Nginx container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: started
+        restart: true
+      when: docker_action == 'RESTART'
+
+    - name: Remove Nginx container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+      when: docker_action == 'REMOVE'
+
+    - name: Get Docker container information
+      ansible.builtin.command:
+        argv:
+          - docker
+          - inspect
+          - --format
+          - "{{ '{{' }}.State.Status{{ '}}' }}"
+          - "{{ container_name }}"
+      register: container_status
+      changed_when: false
+      failed_when: false
+      when: docker_action == 'STATUS'
+
+    - name: Display container status
+      ansible.builtin.debug:
+        msg: "Nginx container status: {{ container_status.stdout | default('Not found') }}"
+      when: docker_action == 'STATUS'
+
+    - name: Verify Nginx HTTP response
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ host_port }}"
+        method: GET
+        status_code: 200
+        return_content: false
+      register: nginx_http
+      retries: 5
+      delay: 3
+      until: nginx_http.status == 200
+      when: docker_action in ['DEPLOY', 'START', 'RESTART', 'STATUS']
+
+    - name: Display HTTP verification
+      ansible.builtin.debug:
+        msg: "Nginx is responding successfully on port {{ host_port }}"
+      when: docker_action in ['DEPLOY', 'START', 'RESTART', 'STATUS']
