@@ -24,7 +24,7 @@
         name: "{{ container_name }}"
         image: "{{ docker_image }}"
         state: started
-        pull: always
+        pull: true
         restart_policy: unless-stopped
         published_ports:
           - "{{ host_port }}:{{ container_port }}"
