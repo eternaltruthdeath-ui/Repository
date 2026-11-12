@@ -1,0 +1,9 @@
+---
+all:
+  children:
+    docker_servers:
+      hosts:
+        jenkins-docker:
+          ansible_host: 192.168.56.109
+          ansible_user: mythadmin
+          ansible_become: true
